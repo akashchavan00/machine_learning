@@ -74,3 +74,7 @@ Find which training samples it misclassified.
 Increase the weights of those misclassified samples.
 Train the second stump, giving more importance to those harder examples.
 Repeat this process for all 50 stumps.
+
+###################
+
+AdaBoost trains weak learners sequentially. After each learner is trained, the algorithm increases the weight of misclassified samples so that the next learner focuses more on those difficult examples. The final prediction is a weighted combination of all weak learners.
