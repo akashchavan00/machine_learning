@@ -1,0 +1,366 @@
+# First, are Decision Trees always used?
+
+**No.**
+
+Boosting can use other models as weak learners, such as:
+
+* Linear Regression
+* Logistic Regression
+* Naive Bayes
+* SVM
+* Small Neural Networks
+
+However, **almost all modern boosting algorithms (Gradient Boosting, XGBoost, LightGBM, CatBoost)** use **decision trees** because they consistently work better for most tabular datasets.
+
+---
+
+# Why Decision Trees?
+
+## Reason 1: They Learn Complex Relationships
+
+Suppose we want to predict whether someone will buy a laptop.
+
+Dataset:
+
+| Age | Salary | Bought |
+| --- | ------ | ------ |
+| 25  | 40k    | No     |
+| 40  | 80k    | Yes    |
+| 55  | 90k    | Yes    |
+
+A linear model assumes a straight-line relationship.
+
+A decision tree can learn rules like:
+
+```text
+IF Age > 35
+    AND Salary > 60k
+        Buy = Yes
+ELSE
+        Buy = No
+```
+
+Decision trees naturally capture **non-linear** patterns.
+
+---
+
+# Reason 2: No Feature Scaling Needed
+
+Algorithms like SVM or Logistic Regression often require scaling.
+
+Example:
+
+```text
+Age = 30
+
+Salary = 900000
+```
+
+The large difference in scale can affect those algorithms.
+
+Decision trees only ask questions such as:
+
+```text
+Salary > 500000?
+```
+
+They compare values rather than distances, so scaling is generally unnecessary.
+
+---
+
+# Reason 3: They Handle Numerical and Categorical Features
+
+Example:
+
+| Age | Gender | City   |
+| --- | ------ | ------ |
+| 30  | Male   | Pune   |
+| 22  | Female | Mumbai |
+
+Decision trees can work with both numerical and (depending on the implementation) categorical variables or encoded categorical variables.
+
+---
+
+# Reason 4: They Are Fast to Train
+
+Building a small tree is relatively quick.
+
+Boosting trains many trees.
+
+If each tree took a long time,
+
+training would become impractical.
+
+---
+
+# Reason 5: Trees Can Focus on Mistakes
+
+Imagine the first tree predicts
+
+```text
+Wrong
+
+Wrong
+
+Correct
+
+Wrong
+```
+
+The next tree can specialize in the remaining mistakes.
+
+This sequential correction is exactly what boosting needs.
+
+---
+
+# Reason 6: Trees Capture Feature Interactions
+
+Suppose:
+
+```text
+Age > 30
+
+AND
+
+Income > 50k
+
+AND
+
+City = Pune
+```
+
+The prediction depends on a combination of features.
+
+Decision trees naturally learn these interactions without manual feature engineering.
+
+---
+
+# Reason 7: Trees Are Easy to Combine
+
+Suppose each tree is tiny.
+
+```text
+Tree 1
+
+IF Age > 30
+```
+
+Tree 2
+
+```text
+IF Salary > 50k
+```
+
+Tree 3
+
+```text
+IF Experience > 5
+```
+
+Boosting combines hundreds of these simple trees into one strong model.
+
+---
+
+# Reason 8: Trees Work Well With Residuals
+
+Gradient Boosting doesn't ask each new tree to predict the original target.
+
+Instead,
+
+it predicts the **residuals** (or more generally, the negative gradients).
+
+Example:
+
+```text
+Actual Price = 100
+
+Prediction = 90
+
+Residual = 10
+```
+
+A small decision tree can easily learn where corrections are needed.
+
+---
+
+# Why Not Logistic Regression?
+
+Suppose we use Logistic Regression.
+
+First model
+
+```text
+60% Accuracy
+```
+
+Second model
+
+```text
+65%
+```
+
+Third model
+
+```text
+66%
+```
+
+Linear models are often too simple to make meaningful corrections for complex data.
+
+Decision trees can fit these residuals much more effectively.
+
+---
+
+# Why Not SVM?
+
+SVMs are powerful but:
+
+* Slower to train.
+* Require feature scaling.
+* Harder to update repeatedly in a boosting framework.
+* More computationally expensive when hundreds of sequential models are needed.
+
+Boosting typically builds **hundreds of weak learners**, so lightweight models are preferred.
+
+---
+
+# Why Not Neural Networks?
+
+Neural networks:
+
+* Require many parameters.
+* Take longer to train.
+* Need more data.
+* Need careful tuning.
+
+Imagine training **500 neural networks sequentially**.
+
+That would be much slower than training **500 small decision trees**.
+
+---
+
+# Why Shallow Trees?
+
+Boosting usually uses shallow trees.
+
+Example
+
+Depth = 1
+
+```text
+       Root
+      /    \
+    Leaf   Leaf
+```
+
+Depth = 3
+
+```text
+          Root
+        /      \
+      Node      Node
+     /   \     /   \
+```
+
+Why?
+
+A deep tree might already fit the training data extremely well.
+
+Boosting works best when each learner is **weak**. Many weak learners combine to create a strong model while reducing the risk of overfitting.
+
+---
+
+# Real-Life Analogy
+
+Imagine a hospital.
+
+One doctor tries to diagnose every disease.
+
+Accuracy:
+
+```text
+70%
+```
+
+Instead,
+
+have many specialists:
+
+Doctor 1
+
+```text
+Heart
+```
+
+Doctor 2
+
+```text
+Lungs
+```
+
+Doctor 3
+
+```text
+Brain
+```
+
+Each specialist handles one part of the problem.
+
+Together,
+
+diagnosis becomes much better.
+
+Decision trees are like these specialists—each tree is simple, but together they make a powerful prediction.
+
+---
+
+# Interview Questions
+
+## 1. Why are decision trees preferred in boosting?
+
+**Answer:**
+
+Decision trees are fast, naturally handle non-linear relationships, require little preprocessing, capture feature interactions, and work well as weak learners that can be combined sequentially.
+
+---
+
+## 2. Can boosting use algorithms other than decision trees?
+
+**Answer:**
+
+Yes. Boosting is a general framework and can use other weak learners such as linear models or SVMs. However, modern boosting algorithms like XGBoost, LightGBM, and CatBoost use decision trees because they typically provide the best balance of accuracy, speed, and flexibility on tabular data.
+
+---
+
+## 3. Why are shallow trees used instead of deep trees?
+
+**Answer:**
+
+Shallow trees are intentionally weak learners. Each tree learns only part of the problem, allowing subsequent trees to correct the remaining errors. This approach usually generalizes better than relying on a few very deep trees.
+
+---
+
+## 4. Why don't boosting algorithms usually use neural networks?
+
+**Answer:**
+
+Neural networks are computationally expensive, require more tuning and data, and are not well suited to the idea of training hundreds of small sequential learners. Small decision trees are much faster and more efficient for boosting on tabular data.
+
+---
+
+# Easy Way to Remember
+
+| Reason                 | Why Decision Trees Are Preferred                         |
+| ---------------------- | -------------------------------------------------------- |
+| Non-linear learning    | Capture complex patterns easily                          |
+| Fast                   | Small trees train quickly                                |
+| No scaling             | Usually no normalization required                        |
+| Handles mixed features | Works well with numerical and encoded categorical data   |
+| Fits residuals well    | Ideal for Gradient Boosting                              |
+| Weak learner           | Perfect building block for boosting                      |
+| Easy to combine        | Hundreds of trees form a strong ensemble                 |
+| Interpretable          | Feature importance and split logic are easier to inspect |
+
+### One interview sentence to remember:
+
+> **Decision trees are the preferred weak learner in boosting because they are fast, capture non-linear relationships, require minimal preprocessing, and effectively learn the residual errors that each boosting iteration is designed to correct.**
